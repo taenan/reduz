@@ -6,7 +6,7 @@ import org.springframework.hateoas.server.core.Relation;
 import lombok.Getter;
 import lombok.Setter;
 
-@Relation(collectionRelation = "cidades")
+@Relation(collectionRelation = "categories", itemRelation = "category")
 @Setter
 @Getter
 public class CategoryModel extends RepresentationModel<CategoryModel> {
