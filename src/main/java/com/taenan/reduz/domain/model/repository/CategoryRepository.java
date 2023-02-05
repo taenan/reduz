@@ -13,6 +13,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 	Page<Category> findByStatus(Pageable pageable, Status status);
 
-    List<Category> findByNameAndStatus(String name, Status status);
+    List<Category> findByNameIgnoreCaseAndStatus(String name, Status status);
+    
+    List<Category> findByNameIgnoreCaseAndIdNot(String name, Long id);
 	
 }

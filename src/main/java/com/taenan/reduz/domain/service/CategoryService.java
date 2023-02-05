@@ -14,6 +14,8 @@ import com.taenan.reduz.domain.model.Category;
 import com.taenan.reduz.domain.model.repository.CategoryRepository;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 
 @Service
@@ -26,7 +28,7 @@ public class CategoryService {
 
 	public CategoryModel create(@Valid CategoryInput categoryInput) {
 
-		categoryRepository.findByNameAndStatus(categoryInput.getName(), Status.ACTIVE).stream().findAny()
+		categoryRepository.findByNameIgnoreCaseAndStatus(categoryInput.getName(), Status.ACTIVE).stream().findAny()
 				.ifPresent(c -> {
 					throw new DomainException("Uma categoria com o nome " + categoryInput.getName() + " já existe.");
 				});
@@ -41,7 +43,22 @@ public class CategoryService {
 		return categoryModel;
 	}
 
-	public Category buscarOuFalhar(Long categoryId) {
+	public CategoryModel update(@Positive @NotNull Long id, @Valid CategoryInput categoryInput) {
+		checkNameExists(categoryInput.getName(), id);
+
+		Category actual = this.findOrFail(id);
+		categoryInputDisassembler.copyToDomainObject(categoryInput, actual);
+		actual = categoryRepository.save(actual);
+		return categoryModelAssembler.toModel(actual);
+	}
+
+	public Category findOrFail(Long categoryId) {
 		return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
+	}
+
+	private void checkNameExists(String name, Long id) {
+		categoryRepository.findByNameIgnoreCaseAndIdNot(name, id).stream().findAny().ifPresent(c -> {
+			throw new DomainException("Uma categoria com o nome " + name + " já existe.");
+		});
 	}
 }
