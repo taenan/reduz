@@ -13,7 +13,7 @@ public class CategoryInput {
 	
 	@NotBlank 
 	@NotNull
-	@Length(min = 5, max = 200)
+	@Length(max = 200)
 	private String name;
 	
 	@NotBlank

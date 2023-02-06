@@ -28,10 +28,9 @@ public class CategoryService {
 
 	public CategoryModel create(@Valid CategoryInput categoryInput) {
 
-		categoryRepository.findByNameIgnoreCaseAndStatus(categoryInput.getName(), Status.ACTIVE).stream().findAny()
-				.ifPresent(c -> {
-					throw new DomainException("Uma categoria com o nome " + categoryInput.getName() + " já existe.");
-				});
+		categoryRepository.findByNameIgnoreCase(categoryInput.getName()).stream().findAny().ifPresent(c -> {
+			throw new DomainException("Uma categoria com o nome " + categoryInput.getName() + " já existe.");
+		});
 
 		Category category = categoryInputDisassembler.toDomainObject(categoryInput);
 		category.setStatus(Status.ACTIVE);
@@ -55,10 +54,15 @@ public class CategoryService {
 	public Category findOrFail(Long categoryId) {
 		return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
 	}
-
+	
 	private void checkNameExists(String name, Long id) {
 		categoryRepository.findByNameIgnoreCaseAndIdNot(name, id).stream().findAny().ifPresent(c -> {
 			throw new DomainException("Uma categoria com o nome " + name + " já existe.");
 		});
+	}
+
+	public void delete(@Positive @NotNull Long id) {
+		categoryRepository.delete(categoryRepository.findById(id)
+        .orElseThrow(() -> new CategoryNotFoundException(id)));
 	}
 }

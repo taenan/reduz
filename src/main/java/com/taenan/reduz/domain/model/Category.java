@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@SQLDelete(sql = "UPDATE Course SET status = 'Inactive' WHERE id=?")
+@SQLDelete(sql = "UPDATE Category SET status = 'Inactive' WHERE id=?")
 @Where(clause = "status <> 'Inactive'")
 public class Category {
 
@@ -33,7 +33,7 @@ public class Category {
 	@NotBlank
 	@NotNull
 	@Column(nullable = false)
-	@Length(min = 5, max = 200)
+	@Length(max = 200)
 	private String name;
 	
 	@NotBlank
