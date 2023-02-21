@@ -1,6 +1,10 @@
 package com.taenan.reduz.domain.service;
 
+import java.util.List;
+
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.taenan.reduz.api.ResourceUriHelper;
 import com.taenan.reduz.api.assembler.CategoryInputDisassembler;
@@ -20,11 +24,17 @@ import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
+@Validated
 public class CategoryService {
 
 	private CategoryRepository categoryRepository;
 	private CategoryModelAssembler categoryModelAssembler;
 	private CategoryInputDisassembler categoryInputDisassembler;
+
+	public CollectionModel<CategoryModel> findAll() {
+		List<Category> categories = categoryRepository.findAll();
+		return categoryModelAssembler.toCollectionModel(categories);
+	}
 
 	public CategoryModel create(@Valid CategoryInput categoryInput) {
 
@@ -54,15 +64,14 @@ public class CategoryService {
 	public Category findOrFail(Long categoryId) {
 		return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
 	}
+
+	public void delete(@Positive @NotNull Long id) {
+		categoryRepository.delete(categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id)));
+	}
 	
 	private void checkNameExists(String name, Long id) {
 		categoryRepository.findByNameIgnoreCaseAndIdNot(name, id).stream().findAny().ifPresent(c -> {
 			throw new DomainException("Uma categoria com o nome " + name + " já existe.");
 		});
-	}
-
-	public void delete(@Positive @NotNull Long id) {
-		categoryRepository.delete(categoryRepository.findById(id)
-        .orElseThrow(() -> new CategoryNotFoundException(id)));
 	}
 }

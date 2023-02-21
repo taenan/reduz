@@ -11,8 +11,8 @@ public class CategoryNotFoundException extends EntityNotFoundException {
 		super(message);
 	}
 	
-	public CategoryNotFoundException(Long categoryId) {
-		this(String.format("Categoria com código %d não encontrada", categoryId));
+	public CategoryNotFoundException(Long id) {
+		this(String.format("Link com código %d não encontrado", id));
 	}
 	
 }
