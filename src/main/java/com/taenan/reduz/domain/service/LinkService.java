@@ -55,13 +55,13 @@ public class LinkService {
 
 		HttpResponse<String> response;
 		try {
-			if(!UrlValidator.isValid(url)) {
+			if (!UrlValidator.isValid(url)) {
 				throw new DomainException("URL inválida");
 			}
 			response = HttpClient.newHttpClient().send(HttpRequest.newBuilder().uri(URI.create(url)).build(),
 					HttpResponse.BodyHandlers.ofString());
 		} catch (IOException | InterruptedException e) {
-			throw new DomainException(String.format("Não foi possível obter resposta do site %s",url));
+			throw new DomainException(String.format("Não foi possível obter resposta do site %s", url));
 		}
 
 		linkModel.setTitle(findTitle(response.body()));
@@ -69,9 +69,10 @@ public class LinkService {
 
 		return linkModel;
 	}
-	
+
 	public LinkModel findBySlug(String slug) {
-		return linkModelAssembler.toModel(linkRepository.findBySlug(slug).orElseThrow(() -> new LinkNotFoundException()));
+		return linkModelAssembler
+				.toModel(linkRepository.findBySlug(slug).orElseThrow(() -> new LinkNotFoundException()));
 	}
 
 	public CollectionModel<LinkModel> findAll() {
@@ -98,6 +99,12 @@ public class LinkService {
 
 	public void delete(@Positive @NotNull Long id) {
 		linkRepository.delete(linkRepository.findById(id).orElseThrow(() -> new LinkNotFoundException(id)));
+	}
+
+	public void increaseCounter(@Positive @NotNull Long id) {
+		Link link = linkRepository.findById(id).orElseThrow(() -> new LinkNotFoundException(id));
+		link.setCounter(link.getCounter() + 1);
+		linkRepository.save(link);
 	}
 
 	private String findFavicon(String url) {
