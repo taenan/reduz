@@ -29,4 +29,8 @@ public class LinkInput {
 	@Valid
 	@NotNull
 	private CategoryIdInput category;
+	
+//	@Valid
+//	@NotNull
+//	private UserIdInput userIdInput;
 }

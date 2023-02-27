@@ -1,6 +1,6 @@
 package com.taenan.reduz.api.model.input;
 
-import org.hibernate.validator.constraints.Length;	
+import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,4 +20,8 @@ public class CategoryInput {
 	@NotNull
 	@Length(max = 30)
 	private String icon;
+	
+//	@Valid
+//	@NotNull
+//	private UserIdInput userIdInput;
 }

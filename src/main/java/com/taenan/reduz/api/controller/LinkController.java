@@ -35,41 +35,40 @@ public class LinkController {
 	public CollectionModel<LinkModel> findAll() {
 		return linkService.findAll();
 	}
-	
+
 	@GetMapping("/{id}")
 	public LinkModel findById(@PathVariable @Positive @NotNull Long id) {
 		return linkService.findById(id);
 	}
-	
+
 	@GetMapping("/public/findbyslug")
 	public LinkModel findBySlug(@RequestParam("slug") String slug) {
 		return linkService.findBySlug(slug);
 	}
-	
+
 	@GetMapping("loadurl")
 	public LinkModel loadUrl(@RequestParam("url") String url) {
 		return linkService.loadUrl(url);
 	}
-	
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public LinkModel create(@RequestBody @Valid LinkInput linkInput) {
 		return linkService.create(linkInput);
 	}
-	
+
 	@DeleteMapping("/{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @Positive @NotNull Long id) {
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public void delete(@PathVariable @Positive @NotNull Long id) {
 		linkService.delete(id);
-    }
-	
+	}
+
 	@PutMapping("/public/{id}/increasecounter")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void increaseCounter(@PathVariable @Positive @NotNull Long id) {
+	@ResponseStatus(code = HttpStatus.NO_CONTENT)
+	public void increaseCounter(@PathVariable @Positive @NotNull Long id) {
 		System.out.println("increasing counter");
 		linkService.increaseCounter(id);
-    }
-	
-	
+	}
+
 }

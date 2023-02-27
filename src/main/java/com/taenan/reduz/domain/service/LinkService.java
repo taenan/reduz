@@ -27,6 +27,7 @@ import com.taenan.reduz.domain.enums.Status;
 import com.taenan.reduz.domain.exception.DomainException;
 import com.taenan.reduz.domain.exception.EntityNotFoundException;
 import com.taenan.reduz.domain.model.Link;
+import com.taenan.reduz.domain.model.User;
 import com.taenan.reduz.domain.model.repository.LinkRepository;
 import com.taenan.reduz.domain.validator.UrlValidator;
 
@@ -42,12 +43,13 @@ public class LinkService {
 	private static final String GOOGLE_API = "https://www.google.com/s2/favicons?domain=";
 	private static final String MSG_URL_EXISTS = "O link para a URL informada já existe.";
 
+	private UserService userService;
 	private LinkRepository linkRepository;
 	private LinkModelAssembler linkModelAssembler;
 	private LinkInputDisassembler linkInputDisassembler;
 
 	public LinkModel findById(@Positive @NotNull Long id) {
-		return linkModelAssembler.toModel(linkRepository.findById(id)
+		return linkModelAssembler.toModel(linkRepository.findByIdAndUser(id, userService.getUserLogged())
 				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class, id)));
 	}
 
@@ -77,19 +79,21 @@ public class LinkService {
 	}
 
 	public CollectionModel<LinkModel> findAll() {
-		List<Link> links = linkRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+		User user = userService.getUserLogged();
+		List<Link> links = linkRepository.findByUser(user, Sort.by(Sort.Direction.DESC, "id"));
 		return linkModelAssembler.toCollectionModel(links);
 	}
 
 	public LinkModel create(@Valid LinkInput linkInput) {
 
-		linkRepository.findByOriginalIgnoreCase(linkInput.getOriginal()).stream().findAny().ifPresent(c -> {
+		linkRepository.findByOriginalIgnoreCaseAndUser(linkInput.getOriginal(), userService.getUserLogged()).stream().findAny().ifPresent(c -> {
 			throw new DomainException(MSG_URL_EXISTS);
 		});
 
 		Link link = linkInputDisassembler.toDomainObject(linkInput);
 		link.generateSlug();
 		link.setStatus(Status.ACTIVE);
+		link.setUser(userService.getUserLogged());
 		link = linkRepository.save(link);
 		LinkModel linkModel = linkModelAssembler.toModel(link);
 
@@ -99,7 +103,7 @@ public class LinkService {
 	}
 
 	public void delete(@Positive @NotNull Long id) {
-		linkRepository.delete(linkRepository.findById(id)
+		linkRepository.delete(linkRepository.findByIdAndUser(id, userService.getUserLogged())
 				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class, id)));
 	}
 

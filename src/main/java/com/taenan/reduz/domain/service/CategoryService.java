@@ -30,20 +30,22 @@ public class CategoryService {
 	private CategoryRepository categoryRepository;
 	private CategoryModelAssembler categoryModelAssembler;
 	private CategoryInputDisassembler categoryInputDisassembler;
+	private UserService userService;
 
 	public CollectionModel<CategoryModel> findAll() {
-		List<Category> categories = categoryRepository.findAll();
+		List<Category> categories = categoryRepository.findByUser(userService.getUserLogged());
 		return categoryModelAssembler.toCollectionModel(categories);
 	}
 
 	public CategoryModel create(@Valid CategoryInput categoryInput) {
 
-		categoryRepository.findByNameIgnoreCase(categoryInput.getName()).stream().findAny().ifPresent(c -> {
+		categoryRepository.findByNameIgnoreCaseAndUser(categoryInput.getName(), userService.getUserLogged()).stream().findAny().ifPresent(c -> {
 			throw new DomainException("Uma categoria com o nome " + categoryInput.getName() + " já existe.");
 		});
 
 		Category category = categoryInputDisassembler.toDomainObject(categoryInput);
 		category.setStatus(Status.ACTIVE);
+		category.setUser(userService.getUserLogged());
 		category = categoryRepository.save(category);
 		CategoryModel categoryModel = categoryModelAssembler.toModel(category);
 
@@ -62,16 +64,15 @@ public class CategoryService {
 	}
 
 	public Category findOrFail(Long categoryId) {
-		//return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
-		return categoryRepository.findById(categoryId).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,categoryId));
+		return categoryRepository.findByIdAndUser(categoryId, userService.getUserLogged()).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,categoryId));
 	}
 
 	public void delete(@Positive @NotNull Long id) {
-		categoryRepository.delete(categoryRepository.findById(id).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,id)));
+		categoryRepository.delete(categoryRepository.findByIdAndUser(id, userService.getUserLogged()).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,id)));
 	}
 	
 	private void checkNameExists(String name, Long id) {
-		categoryRepository.findByNameIgnoreCaseAndIdNot(name, id).stream().findAny().ifPresent(c -> {
+		categoryRepository.findByNameIgnoreCaseAndUserAndIdNot(name, userService.getUserLogged(), id).stream().findAny().ifPresent(c -> {
 			throw new DomainException("Uma categoria com o nome " + name + " já existe.");
 		});
 	}

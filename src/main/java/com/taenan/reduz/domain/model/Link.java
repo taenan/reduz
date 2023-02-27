@@ -71,6 +71,12 @@ public class Link {
 	@ManyToOne
 	@JoinColumn(nullable = false)
 	private Category category;
+	
+	@Valid
+	@NotNull
+	@ManyToOne
+	@JoinColumn(nullable = false)
+	private User user;
 
 	public void generateSlug() {
 		this.slug = UUID.randomUUID().toString().substring(0, 7);
