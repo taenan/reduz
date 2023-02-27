@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.taenan.reduz.core.web.OffsetDateTimeDeserializer;
 import com.taenan.reduz.core.web.OffsetDateTimeSerializer;
-import com.taenan.reduz.domain.enums.Status;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +29,5 @@ public class LinkModel extends RepresentationModel<LinkModel> {
     @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
 	private OffsetDateTime createdAt;
 	
-	private Status status;
 	private CategoryModel category;
 }

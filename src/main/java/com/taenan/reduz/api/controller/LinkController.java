@@ -41,7 +41,7 @@ public class LinkController {
 		return linkService.findById(id);
 	}
 	
-	@GetMapping("findbyslug")
+	@GetMapping("/public/findbyslug")
 	public LinkModel findBySlug(@RequestParam("slug") String slug) {
 		return linkService.findBySlug(slug);
 	}
@@ -64,9 +64,10 @@ public class LinkController {
 		linkService.delete(id);
     }
 	
-	@PutMapping("/{id}/increasecounter")
+	@PutMapping("/public/{id}/increasecounter")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void increaseCounter(@PathVariable @Positive @NotNull Long id) {
+		System.out.println("increasing counter");
 		linkService.increaseCounter(id);
     }
 	

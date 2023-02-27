@@ -25,7 +25,7 @@ import com.taenan.reduz.api.model.LinkModel;
 import com.taenan.reduz.api.model.input.LinkInput;
 import com.taenan.reduz.domain.enums.Status;
 import com.taenan.reduz.domain.exception.DomainException;
-import com.taenan.reduz.domain.exception.LinkNotFoundException;
+import com.taenan.reduz.domain.exception.EntityNotFoundException;
 import com.taenan.reduz.domain.model.Link;
 import com.taenan.reduz.domain.model.repository.LinkRepository;
 import com.taenan.reduz.domain.validator.UrlValidator;
@@ -47,7 +47,8 @@ public class LinkService {
 	private LinkInputDisassembler linkInputDisassembler;
 
 	public LinkModel findById(@Positive @NotNull Long id) {
-		return linkModelAssembler.toModel(linkRepository.findById(id).orElseThrow(() -> new LinkNotFoundException(id)));
+		return linkModelAssembler.toModel(linkRepository.findById(id)
+				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class, id)));
 	}
 
 	public LinkModel loadUrl(@NotNull String url) {
@@ -71,8 +72,8 @@ public class LinkService {
 	}
 
 	public LinkModel findBySlug(String slug) {
-		return linkModelAssembler
-				.toModel(linkRepository.findBySlug(slug).orElseThrow(() -> new LinkNotFoundException()));
+		return linkModelAssembler.toModel(linkRepository.findBySlug(slug)
+				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class)));
 	}
 
 	public CollectionModel<LinkModel> findAll() {
@@ -98,11 +99,13 @@ public class LinkService {
 	}
 
 	public void delete(@Positive @NotNull Long id) {
-		linkRepository.delete(linkRepository.findById(id).orElseThrow(() -> new LinkNotFoundException(id)));
+		linkRepository.delete(linkRepository.findById(id)
+				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class, id)));
 	}
 
 	public void increaseCounter(@Positive @NotNull Long id) {
-		Link link = linkRepository.findById(id).orElseThrow(() -> new LinkNotFoundException(id));
+		Link link = linkRepository.findById(id)
+				.orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Link.class, id));
 		link.setCounter(link.getCounter() + 1);
 		linkRepository.save(link);
 	}

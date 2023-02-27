@@ -12,8 +12,8 @@ import com.taenan.reduz.api.assembler.CategoryModelAssembler;
 import com.taenan.reduz.api.model.CategoryModel;
 import com.taenan.reduz.api.model.input.CategoryInput;
 import com.taenan.reduz.domain.enums.Status;
-import com.taenan.reduz.domain.exception.CategoryNotFoundException;
 import com.taenan.reduz.domain.exception.DomainException;
+import com.taenan.reduz.domain.exception.EntityNotFoundException;
 import com.taenan.reduz.domain.model.Category;
 import com.taenan.reduz.domain.model.repository.CategoryRepository;
 
@@ -62,11 +62,12 @@ public class CategoryService {
 	}
 
 	public Category findOrFail(Long categoryId) {
-		return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
+		//return categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
+		return categoryRepository.findById(categoryId).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,categoryId));
 	}
 
 	public void delete(@Positive @NotNull Long id) {
-		categoryRepository.delete(categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id)));
+		categoryRepository.delete(categoryRepository.findById(id).orElseThrow(() -> EntityNotFoundException.throwIfEntityNotFound(Category.class,id)));
 	}
 	
 	private void checkNameExists(String name, Long id) {
